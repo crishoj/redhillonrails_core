@@ -76,14 +76,11 @@ module RedHillConsulting::Core::ActiveRecord::ConnectionAdapters
       foreign_keys = []
 
       results.each do |row|
-        next if row[3] != table_name
+        next unless table_name.casecmp(row[3]) == 0
         if current_foreign_key != row[0]
-          foreign_keys << ForeignKeyDefinition.new(row[0], row[1], [], row[3], [])
+          foreign_keys << foreign_keys(row[1]).find { |fk| fk.name == row[0] }
           current_foreign_key = row[0]
         end
-
-        foreign_keys.last.column_names << row[2]
-        foreign_keys.last.references_column_names << row[4]
       end
 
       foreign_keys
